@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#05070d">
+<meta name="description" content="Anime Hub — discover top anime, airing shows, favorites, movies and more.">
+<title>Anime Hub — Next</title>
+<style>
+:root{
+ --bg:#05070d;--panel:rgba(8,11,20,.76);--panel2:rgba(14,18,31,.92);
+ --line:rgba(255,255,255,.10);--text:#f6f7fb;--muted:#9ca7bd;
+ --blue:#5d8dff;--cyan:#6ee7ff;--red:#ff4f70;--gold:#ffc857;
+}
+*{box-sizing:border-box}html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,-apple-system,Segoe UI,Arial,sans-serif}
+body:before{
+ content:"";position:fixed;inset:0;z-index:-5;pointer-events:none;
+ background:linear-gradient(90deg,rgba(2,4,9,.90),rgba(2,4,9,.58) 48%,rgba(2,4,9,.84)),
+ url("anime-background.jpg") center/cover no-repeat;
+}
+body:after{content:"";position:fixed;inset:0;z-index:-4;pointer-events:none;
+background:linear-gradient(180deg,transparent 58%,rgba(5,7,13,.98));}
+button,input,select{font:inherit}.hidden{display:none!important}
+.app{min-height:100vh;display:flex}
+.dashboard{
+position:fixed;top:16px;left:16px;z-index:50;
+width:290px;max-width:calc(100vw - 32px);
+background:rgba(5,8,15,.90);border:1px solid var(--line);border-radius:20px;
+box-shadow:0 10px 32px rgba(0,0,0,.30);
+transform:translateX(calc(-100% - 24px));transition:transform .16s ease;padding:16px;
+}
+.dashboard.open{transform:translateX(0)}
+.dashHead{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.dashTitle{font-size:20px;font-weight:900}.closeDash{background:none;border:0;color:white;font-size:22px;cursor:pointer}
+.profileMini{padding:13px;border:1px solid var(--line);border-radius:14px;background:rgba(255,255,255,.035);margin-bottom:12px}
+.profileMini b{display:block}.profileMini span{font-size:11px;color:var(--muted)}
+.nav{display:grid;gap:7px}.nav button{
+border:1px solid transparent;background:rgba(255,255,255,.035);color:#e8ebf4;
+padding:11px 12px;border-radius:12px;text-align:left;cursor:pointer;transition:.18s
+}
+.nav button:hover,.nav button.active{background:rgba(93,141,255,.14);border-color:rgba(93,141,255,.30)}
+.menuBtn{
+position:fixed;top:16px;left:16px;z-index:60;width:48px;height:48px;border:1px solid var(--line);
+border-radius:15px;background:rgba(5,8,15,.72);color:white;cursor:pointer;
+font-size:20px;box-shadow:0 6px 20px rgba(0,0,0,.22)
+}
+.topbar{
+position:fixed;top:0;left:0;right:0;height:78px;z-index:30;
+display:flex;align-items:center;justify-content:center;
+background:linear-gradient(180deg,rgba(4,6,12,.82),rgba(4,6,12,.25),transparent);
+pointer-events:none
+}
+.brand{font-weight:950;letter-spacing:2px;font-size:22px;text-shadow:0 4px 24px rgba(93,141,255,.4)}
+.account{
+position:fixed;right:18px;top:16px;z-index:60;padding:10px 13px;border:1px solid var(--line);
+border-radius:13px;background:rgba(5,8,15,.70);font-size:12px;color:#dce5ff;
+cursor:pointer
+}
+main{width:min(1420px,100%);margin:auto;padding:100px 28px 42px}
+.hero{max-width:920px;margin:7vh auto 54px;text-align:center}
+.kicker{font-size:10px;letter-spacing:4px;color:#aab7d8;margin-bottom:15px}
+.hero h1{font-size:clamp(48px,9vw,92px);line-height:.9;margin:0;letter-spacing:-5px;
+background:linear-gradient(100deg,#fff,#a9d8ff 42%,#ff91a6 75%,#fff);
+-webkit-background-clip:text;color:transparent}
+.hero p{color:var(--muted);max-width:650px;margin:22px auto;font-size:14px;line-height:1.7}
+.searchBox{max-width:650px;margin:24px auto 0;display:flex;padding:7px;border:1px solid var(--line);
+border-radius:17px;background:rgba(7,10,18,.76);backdrop-filter:blur(14px)}
+.searchBox input{flex:1;background:transparent;border:0;outline:0;color:white;padding:12px}
+.searchBox button{border:0;border-radius:12px;padding:0 18px;background:linear-gradient(135deg,var(--blue),#7b55e8);color:white;cursor:pointer;font-weight:800}
+.section{margin:34px 0}.sectionHead{display:flex;align-items:end;justify-content:space-between;margin-bottom:14px}
+.sectionHead h2{margin:0;font-size:22px}.sectionHead span{font-size:11px;color:var(--muted)}
+.tabs{display:flex;gap:7px;overflow:auto;padding-bottom:5px;margin-bottom:16px}.tab{
+white-space:nowrap;border:1px solid var(--line);background:rgba(255,255,255,.035);color:#dfe5f4;
+padding:9px 13px;border-radius:999px;cursor:pointer;font-size:11px}.tab.active{background:rgba(93,141,255,.16);border-color:rgba(93,141,255,.35)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:15px}
+.card{border:1px solid var(--line);border-radius:16px;overflow:hidden;background:rgba(8,11,20,.78);
+transition:transform .12s ease,border-color .12s ease,background-color .12s ease;cursor:pointer;position:relative}
+.card:hover{transform:translateY(-5px);border-color:rgba(110,231,255,.30);box-shadow:0 8px 24px rgba(0,0,0,.24)}
+.poster{width:100%;aspect-ratio:2/3;object-fit:cover;display:block;background:#111827}
+.cardBody{padding:10px}.title{font-weight:800;font-size:12px;line-height:1.35;min-height:32px}.meta{font-size:10px;color:var(--muted);margin-top:5px}
+.badge{position:absolute;top:8px;left:8px;background:rgba(0,0,0,.72);border:1px solid rgba(255,255,255,.12);
+border-radius:999px;padding:5px 7px;font-size:9px}.fav{
+position:absolute;top:8px;right:8px;width:31px;height:31px;border:1px solid rgba(255,255,255,.12);
+border-radius:10px;background:rgba(0,0,0,.64);color:white;cursor:pointer
+}
+.empty{padding:35px;text-align:center;color:var(--muted);border:1px dashed var(--line);border-radius:15px}
+footer{text-align:center;color:#8f99ae;font-size:11px;padding:35px 0 8px}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.75);display:none;place-items:center;z-index:100;padding:18px}
+.modal.show{display:grid}.modalCard{width:min(850px,100%);max-height:90vh;overflow:auto;background:#090d18;
+border:1px solid var(--line);border-radius:22px;padding:20px;box-shadow:0 30px 100px rgba(0,0,0,.6)}
+.modalTop{display:flex;gap:18px}.detailPoster{width:190px;max-width:35%;aspect-ratio:2/3;object-fit:cover;border-radius:15px}.detailText{flex:1}
+.detailText h2{margin:5px 0 8px;font-size:28px}.detailText p{color:#b5bfd3;line-height:1.7;font-size:13px}.close{float:right;border:0;background:rgba(255,255,255,.06);color:white;border-radius:10px;padding:8px 11px;cursor:pointer}
+.loginForm{width:min(430px,100%);margin:auto}.loginForm h2{font-size:28px;margin-top:5px}.field{margin:12px 0}.field label{display:block;color:var(--muted);font-size:11px;margin-bottom:6px}.field input{
+width:100%;padding:12px;border:1px solid var(--line);border-radius:12px;background:#050810;color:white;outline:0
+}.save{width:100%;padding:12px;border:0;border-radius:12px;background:linear-gradient(135deg,var(--blue),var(--red));color:white;font-weight:850;cursor:pointer}
+.notice{font-size:10px;color:var(--muted);line-height:1.5;margin-top:10px}
+@media(max-width:700px){
+ main{padding:88px 14px 34px}.topbar{height:62px}.brand{font-size:17px}.account{top:12px;right:12px;font-size:10px}
+ .menuBtn{top:12px;left:12px;width:42px;height:42px}.hero{margin-top:5vh}.grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+ .modalTop{flex-direction:column}.detailPoster{max-width:150px;width:150px}.dashboard{top:10px;left:10px}
+}
+
+/* PERFORMANCE EDITION */
+html{scroll-behavior:auto}
+button,.card,.tab,.account,.menuBtn{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+.card:hover{transform:none}
+@media (hover:hover){
+ .card:hover{transform:translateY(-3px)}
+}
+.poster{content-visibility:auto;background:#111827}
+.grid{contain:layout paint}
+.section{contain:layout}
+</style>
+</head>
+<body>
+<button class="menuBtn" id="menuBtn" aria-label="Open dashboard">☰</button>
+<div class="topbar"><div class="brand">ANIME HUB</div></div>
+<button class="account" id="accountBtn">Login</button>
+
+<aside class="dashboard" id="dashboard">
+ <div class="dashHead"><div class="dashTitle">Dashboard</div><button class="closeDash" id="closeDash">×</button></div>
+ <div class="profileMini" id="profileMini"><b>Guest</b><span>Not logged in</span></div>
+ <div class="nav">
+  <button class="active" data-view="home">Home</button>
+  <button data-view="login">Login</button>
+  <button data-view="favorites">Favorites</button>
+  <button data-view="airing">Top Airing</button>
+  <button data-view="best">Best Anime</button>
+  <button data-view="movies">Movies</button>
+  <button data-view="genres">Genres</button>
+  <button data-view="history">History</button>
+  <button data-view="settings">Settings</button>
+ </div>
+</aside>
+
+<main>
+ <section class="hero">
+  <div class="kicker">DISCOVER • WATCH • EXPLORE</div>
+  <h1>ANIME HUB</h1>
+  <p>Discover anime, explore popular titles, follow airing shows, save favorites and search the world of anime.</p>
+  <div class="searchBox"><input id="search" placeholder="Search anime..."><button id="searchBtn">Search</button></div>
+ </section>
+
+ <section class="section" id="content">
+  <div class="sectionHead"><h2 id="sectionTitle">Popular Anime</h2><span id="sectionInfo">Loading...</span></div>
+  <div class="tabs">
+   <button class="tab active" data-cat="popular">Popular</button><button class="tab" data-cat="airing">Airing</button>
+   <button class="tab" data-cat="upcoming">Upcoming</button><button class="tab" data-cat="movies">Movies</button>
+   <button class="tab" data-cat="tv">TV</button>
+  </div>
+  <div class="grid" id="grid"></div>
+ </section>
+
+ <footer>Created by Samiul</footer>
+</main>
+
+<div class="modal" id="modal"><div class="modalCard" id="modalContent"></div></div>
+
+<script>
+const API="https://api.jikan.moe/v4";
+const FALLBACK=[
+{id:1,title:"One Piece",score:8.72,type:"TV",year:1999,images:{jpg:{large_image_url:"https://cdn.myanimelist.net/images/anime/1244/138851l.jpg"}},synopsis:"The adventures of Monkey D. Luffy and his crew as they search for the legendary One Piece."},
+{id:20,title:"Naruto",score:8.00,type:"TV",year:2002,images:{jpg:{large_image_url:"https://cdn.myanimelist.net/images/anime/13/17405l.jpg"}},synopsis:"A young ninja works to earn recognition and pursue his dream of becoming Hokage."},
+{id:21,title:"One Punch Man",score:8.50,type:"TV",year:2015,images:{jpg:{large_image_url:"https://cdn.myanimelist.net/images/anime/12/76049l.jpg"}},synopsis:"Saitama can defeat opponents with a single punch and searches for a worthy challenge."},
+{id:16498,title:"Attack on Titan",score:9.05,type:"TV",year:2013,images:{jpg:{large_image_url:"https://cdn.myanimelist.net/images/anime/10/47347l.jpg"}},synopsis:"Humanity fights for survival against mysterious giant Titans."},
+{id:40748,title:"Jujutsu Kaisen",score:8.62,type:"TV",year:2020,images:{jpg:{large_image_url:"https://cdn.myanimelist.net/images/anime/1171/109222l.jpg"}},synopsis:"A student enters the world of cursed energy and jujutsu sorcery."},
+{id:38000,title:"Demon Slayer",score:8.47,type:"TV",year:2019,images:{jpg:{large_image_url:"https://cdn.myanimelist.net/images/anime/1286/99889l.jpg"}},synopsis:"Tanjiro becomes a demon slayer after tragedy strikes his family."},
+{id:51019,title:"Demon Slayer: Infinity Castle",score:8.7,type:"Movie",year:2025,images:{jpg:{large_image_url:"https://cdn.myanimelist.net/images/anime/placeholder.jpg"}},synopsis:"A feature film in the Demon Slayer story."},
+{id:5114,title:"Fullmetal Alchemist: Brotherhood",score:9.10,type:"TV",year:2009,images:{jpg:{large_image_url:"https://cdn.myanimelist.net/images/anime/1223/96541l.jpg"}},synopsis:"Two brothers use alchemy while searching for a way to restore what they lost."}
+];
+let favorites=JSON.parse(localStorage.getItem("animehub_favorites")||"[]");
+let history=JSON.parse(localStorage.getItem("animehub_history")||"[]");
+let user=localStorage.getItem("animehub_user")||"";
+let cache={};
+
+const $=s=>document.querySelector(s);
+const grid=$("#grid"), modal=$("#modal"), modalContent=$("#modalContent");
+
+function img(a){return a?.images?.jpg?.large_image_url||a?.images?.jpg?.image_url||"https://placehold.co/400x600/101522/ffffff?text=Anime";}
+function title(a){return a?.title_english||a?.title||"Unknown Anime";}
+function save(){localStorage.setItem("animehub_favorites",JSON.stringify(favorites));localStorage.setItem("animehub_history",JSON.stringify(history))}
+function isFav(id){return favorites.includes(String(id))}
+function card(a){
+ const id=String(a.mal_id||a.id);cache[id]=a;
+ return `<article class="card" data-id="${id}">
+  <img class="poster" loading="lazy" decoding="async" src="${img(a)}" alt="${esc(title(a))}">
+  <span class="badge">${esc(a.type||"Anime")} ${a.score?"• "+a.score:""}</span>
+  <button class="fav" data-fav="${id}" title="Favorite">${isFav(id)?"♥":"♡"}</button>
+  <div class="cardBody"><div class="title">${esc(title(a))}</div><div class="meta">${a.year||a.aired?.prop?.from?.year||"—"}</div></div>
+ </article>`;
+}
+function esc(s){return String(s||"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]))}
+async function api(path){
+ const controller=new AbortController();
+ const timer=setTimeout(()=>controller.abort(),7000);
+ try{
+  const r=await fetch(API+path,{signal:controller.signal,cache:"no-store"});
+  if(!r.ok)throw Error("API "+r.status);
+  return await r.json();
+ }finally{clearTimeout(timer)}
+}
+async function load(cat="popular"){
+ $("#sectionInfo").textContent="Loading...";
+ let data=[];
+ try{
+  let path="/top/anime?limit=24";
+  if(cat==="airing")path="/top/anime?filter=airing&limit=24";
+  if(cat==="upcoming")path="/top/anime?filter=upcoming&limit=24";
+  if(cat==="movies")path="/top/anime?type=movie&limit=24";
+  if(cat==="tv")path="/top/anime?type=tv&limit=24";
+  data=(await api(path)).data||[];
+ }catch(e){
+  data=cat==="movies"?FALLBACK.filter(x=>x.type==="Movie"):FALLBACK;
+  $("#sectionInfo").textContent="Offline fallback";
+ }
+ $("#sectionInfo").textContent=($("#sectionInfo").textContent==="Loading..."?"Live data":"Offline fallback")+" • "+data.length+" titles";
+ grid.innerHTML=data.length?data.map(card).join(""):'<div class="empty">No anime found.</div>';
+}
+async function search(q){
+ const token=++searchToken;
+ if(!q)return load("popular");
+ $("#sectionTitle").textContent="Search Results";
+ $("#sectionInfo").textContent="Searching...";
+ try{
+  const data=(await api("/anime?q="+encodeURIComponent(q)+"&limit=24")).data||[];
+  if(token!==searchToken)return;
+  $("#sectionInfo").textContent=data.length+" results";
+  grid.innerHTML=data.length?data.map(card).join(""):'<div class="empty">No results.</div>';
+ }catch(e){
+  const data=FALLBACK.filter(x=>title(x).toLowerCase().includes(q.toLowerCase()));
+  $("#sectionInfo").textContent="Offline fallback • "+data.length+" results";
+  grid.innerHTML=data.length?data.map(card).join(""):'<div class="empty">No offline result. Try again online.</div>';
+ }
+}
+async function details(id){
+ const a=cache[id];
+ let d=a;
+ try{d=(await api("/anime/"+id)).data}catch(e){}
+ if(!d)return;
+ history=[id,...history.filter(x=>x!==id)].slice(0,30);save();
+ modalContent.innerHTML=`<button class="close" onclick="modal.classList.remove('show')">Close</button>
+ <div class="modalTop"><img class="detailPoster" src="${img(d)}"><div class="detailText">
+ <h2>${esc(title(d))}</h2><div class="meta">Score: ${d.score||"—"} • ${esc(d.type||"—")} • ${d.year||d.aired?.prop?.from?.year||"—"}</div>
+ <p>${esc(d.synopsis||"No synopsis available.")}</p>
+ <p class="meta">Episodes: ${d.episodes||"—"} • Status: ${esc(d.status||"—")}</p>
+ <button class="save" onclick="toggleFav('${id}');details('${id}')">${isFav(id)?"Remove from Favorites":"Add to Favorites"}</button>
+ </div></div>`;
+ modal.classList.add("show");
+}
+function toggleFav(id){
+ id=String(id);favorites=isFav(id)?favorites.filter(x=>x!==id):[id,...favorites];save();load(currentCat);
+}
+let currentCat="popular"; let searchToken=0;
+function setView(view){
+ $("#dashboard").classList.remove("open");
+ if(view==="login"){openLogin();return}
+ if(view==="favorites"){showFavorites();return}
+ if(view==="history"){showHistory();return}
+ if(view==="genres"){showGenres();return}
+ if(view==="settings"){showSettings();return}
+ currentCat=view==="best"?"popular":view==="airing"?"airing":view==="movies"?"movies":"popular";
+ $("#sectionTitle").textContent=view==="best"?"Best Anime":view==="airing"?"Top Airing":view==="movies"?"Movies":"Popular Anime";
+ load(currentCat);
+}
+function openLogin(){
+ modalContent.innerHTML=`<button class="close" onclick="modal.classList.remove('show')">Close</button><div class="loginForm"><h2>Login</h2>
+ <p class="notice">This version uses a local browser profile. It does not create a real Google account session.</p>
+ <div class="field"><label>Your name</label><input id="loginName" value="${esc(user)}" placeholder="Enter your name"></div>
+ <button class="save" onclick="doLogin()">Continue</button></div>`;
+ modal.classList.add("show");
+}
+function doLogin(){const n=$("#loginName").value.trim();if(!n)return alert("Enter your name.");user=n;localStorage.setItem("animehub_user",user);updateUser();modal.classList.remove("show")}
+function updateUser(){
+ $("#accountBtn").textContent=user||"Login";
+ $("#profileMini").innerHTML=user?`<b>${esc(user)}</b><span>Logged in on this browser</span>`:`<b>Guest</b><span>Not logged in</span>`;
+}
+function showFavorites(){
+ $("#sectionTitle").textContent="Favorites";$("#sectionInfo").textContent=favorites.length+" saved";
+ const data=favorites.map(id=>cache[id]||FALLBACK.find(x=>String(x.id)===id)).filter(Boolean);
+ grid.innerHTML=data.length?data.map(card).join(""):'<div class="empty">Your favorites are empty.</div>';
+}
+function showHistory(){
+ $("#sectionTitle").textContent="History";$("#sectionInfo").textContent=history.length+" viewed";
+ const data=history.map(id=>cache[id]||FALLBACK.find(x=>String(x.id)===id)).filter(Boolean);
+ grid.innerHTML=data.length?data.map(card).join(""):'<div class="empty">No viewing history yet.</div>';
+}
+function showGenres(){
+ $("#sectionTitle").textContent="Genres";$("#sectionInfo").textContent="Choose a genre";
+ const genres=["Action","Adventure","Comedy","Drama","Fantasy","Romance","School","Sports","Mystery","Sci-Fi","Supernatural","Thriller"];
+ grid.innerHTML=genres.map(g=>`<article class="card" style="padding:25px;text-align:center" data-genre="${g}"><div class="title">${g}</div><div class="meta">Explore anime</div></article>`).join("");
+}
+function showSettings(){
+ modalContent.innerHTML=`<button class="close" onclick="modal.classList.remove('show')">Close</button><h2>Settings</h2>
+ <p class="notice">Data such as favorites, history and your local profile are stored in this browser with localStorage.</p>
+ <button class="save" onclick="localStorage.clear();location.reload()">Reset Local Data</button>`;
+ modal.classList.add("show");
+}
+$("#menuBtn").onclick=()=>$("#dashboard").classList.toggle("open");
+$("#closeDash").onclick=()=>$("#dashboard").classList.remove("open");
+$("#accountBtn").onclick=openLogin;
+document.querySelectorAll(".nav button").forEach(b=>b.onclick=()=>setView(b.dataset.view));
+document.querySelectorAll(".tab").forEach(b=>b.onclick=()=>{document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));b.classList.add("active");currentCat=b.dataset.cat;$("#sectionTitle").textContent=b.textContent;load(currentCat)});
+$("#searchBtn").onclick=()=>search($("#search").value.trim());
+$("#search").addEventListener("keydown",e=>{if(e.key==="Enter")search($("#search").value.trim())});
+grid.addEventListener("click",e=>{
+ const fav=e.target.closest("[data-fav]");if(fav){e.stopPropagation();toggleFav(fav.dataset.fav);return}
+ const c=e.target.closest(".card");if(c&&c.dataset.id)details(c.dataset.id);
+});
+modal.addEventListener("click",e=>{if(e.target===modal)modal.classList.remove("show")});
+updateUser();load("popular");
+</script>
+</body>
+</html>
